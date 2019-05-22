@@ -1,7 +1,7 @@
 <div class="container">
 	<?php if(!empty($reg_insert)): ?>
-		<div class="alert alert-primary">
-			<strong>Registro inserido com sucesso!!</strong> 
+		<div class="alert <?php echo $alert_class; ?>">
+			<strong><?php echo $reg_insert; ?></strong> 
 		</div>
 	<?php endif; ?>
 	<h1>Livro de Registro de Imóveis</h1>
@@ -22,8 +22,9 @@
 
 							<label for="loteamento">Loteamento:</label>
 							<select name="loteamento" class="form-control">
-								<option value="1">Loteamento Fazendinha Alfaville</option>
-								<option value="2">Loteamento Agrovila Hortigranjeira</option>
+								<?php foreach($loteamentos as $l): ?>
+									<option value="<?php echo $l['id']; ?>"><?php echo $l['nome']; ?></option>
+								<?php endforeach; ?>
 							</select>
 
 							<div class="row">
@@ -44,7 +45,8 @@
 								</div>
 								<div class="col-sm-6">
 									<label for="cliente">Proprietário:</label>
-									<input class="form-control" type="text" name="cliente">
+									<input type="hidden" id="cliente_id" name="cliente_id">
+									<input class="form-control" type="text" id="busca_cliente" name="cliente">
 								</div>
 								<div class="col-sm-3">
 									<label for="situacao">Situação:</label>
@@ -75,8 +77,9 @@
 
 							<label for="consulta_loteamento">Loteamento:</label>
 							<select name="consulta_loteamento" class="form-control">
-								<option value="1">Loteamento Fazendinha Alfaville</option>
-								<option value="2">Loteamento Agrovila Hortigranjeira</option>
+								<?php foreach($loteamentos as $l): ?>
+									<option value="<?php echo $l['id']; ?>"><?php echo $l['nome']; ?></option>
+								<?php endforeach; ?>
 							</select>
 
 							<div class="row">
@@ -96,8 +99,9 @@
 									<input class="form-control formato_contrato" type="text" name="consulta_contrato_nr" placeholder="00/0000/00">
 								</div>
 								<div class="col-sm-6">
-									<label for="consulta_cliente">Proprietário:</label>
-									<input class="form-control" type="text" name="consulta_cliente">
+									<label for="busca_cliente_consulta">Proprietário:</label>
+									<input type="hidden" name="cliente_id_consulta" id="cliente_id_consulta">
+									<input class="form-control" type="text" name="busca_cliente_consulta" id="busca_cliente_consulta">
 								</div>
 								<div class="col-sm-3">
 									<label for="consulta_situacao">Situação:</label>
@@ -118,6 +122,9 @@
 	</div>
 	<?php if(empty($registros)): ?>
 		<?php else: ?>
+		<div class="container">
+			Últimos 20 registros efetuados
+		</div>
 		<table class="table table-hover">
 			<thead>
 				<tr>
@@ -130,16 +137,16 @@
 				</tr>
 			</thead>
 			<tbody>
-					<?php foreach($registros as $r): ?>
+				<?php foreach($registros as $r): ?>
 				<tr>
-					<td><?php echo $r['nome_loteamento']; ?></td>
+					<td><?php echo $r['loteamento_nome']; ?></td>
 					<td><?php echo $r['quadra']; ?></td>
 					<td><?php echo $r['lote']; ?></td>
-					<td><?php echo $r['numero_contrato']; ?></td>
-					<td><?php echo $r['nome_cliente']; ?></td>
+					<td><?php echo $r['numero']; ?></td>
+					<td><?php echo $r['cliente_nome']; ?></td>
 					<td><?php echo ($r['prop_atual'] == 1)?'Proprietário':'Transferido';  ?></td>
 				</tr>
-					<?php endforeach; ?>
+				<?php endforeach; ?>
 			</tbody>
 		</table>
 	<?php endif; ?>

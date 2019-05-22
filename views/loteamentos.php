@@ -1,7 +1,7 @@
 <div class="container">
 	<?php if(!empty($reg_insert)): ?>
-		<div class="alert alert-primary">
-			<strong>Registro inserido com sucesso!!</strong> 
+		<div class="alert <?php echo $alert_class; ?>">
+			<strong><?php echo $reg_insert; ?></strong> 
 		</div>
 	<?php endif; ?>
 	<h1>Loteamentos</h1>
@@ -27,7 +27,7 @@
 							<input class="form-control" name="endereco">
 
 							<label for="registro_cri">Número do Registro no Cartório de Registro de Imóveis:</label>
-							<input class="form-control" name="registro_CRI">
+							<input class="form-control" name="registro_cri">
 
 							<label for="nome_cri">Nome do Cartório de Registro de Imóveis:</label>
 							<input class="form-control" name="nome_cri">
@@ -58,56 +58,27 @@
 			</div>
 		</div>
 
-		<div class="card">
-			<a class="collapsed card-link" data-toggle="collapse" href="#collapseTwo">
-				<div class="card-header">
-					<strong>CONSULTAR REGISTROS</strong>
-				</div>
-			</a>
-			<div id="collapseTwo" class="collapse" data-parent="#accordion">
-				<div class="card-body">
-					<form method="POST">
-						<div class="form-group">
-
-							<label for="consulta_loteamento">Loteamento:</label>
-							<select name="consulta_loteamento" class="form-control">
-								<option value="1">Loteamento Fazendinha Alfaville</option>
-								<option value="2">Loteamento Agrovila Hortigranjeira</option>
-							</select>
-
-							<br>
-							<input class="form-control btn btn-secondary" type="submit" value="Consultar">
-						</div>
-					</form>
-				</div>
-			</div>
-		</div>
-
 	</div>
-	<?php if(empty($registros)): ?>
+	<?php if(empty($loteamentos)): ?>
 		<?php else: ?>
 		<table class="table table-hover">
 			<thead>
 				<tr>
 					<th>Loteamento</th>
-					<th>Quadra</th>
-					<th>Lote</th>
-					<th>Contrato</th>
-					<th>Cliente</th>
-					<th>Situação</th>
+					<th>Registro C.R.I.</th>
+					<th>Cartório</th>
+					<th>Ações</th>
 				</tr>
 			</thead>
 			<tbody>
-					<?php foreach($registros as $r): ?>
-				<tr>
-					<td><?php echo $r['nome_loteamento']; ?></td>
-					<td><?php echo $r['quadra']; ?></td>
-					<td><?php echo $r['lote']; ?></td>
-					<td><?php echo $r['numero_contrato']; ?></td>
-					<td><?php echo $r['nome_cliente']; ?></td>
-					<td><?php echo ($r['prop_atual'] == 1)?'Proprietário':'Transferido';  ?></td>
-				</tr>
-					<?php endforeach; ?>
+				<?php foreach($loteamentos as $l): ?>
+					<tr>
+						<td><?php echo $l['nome']; ?></td>
+						<td><?php echo $l['registro_cri']; ?></td>
+						<td><?php echo $l['nome_cri']; ?></td>
+						<td>Consultar | Editar | Excluir</td>
+					</tr>
+				<?php endforeach; ?>
 			</tbody>
 		</table>
 	<?php endif; ?>

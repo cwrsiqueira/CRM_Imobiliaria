@@ -59,9 +59,9 @@ class Registros extends model {
 			$id_cliente = $sql->fetch()['id'];
 		}
 
-		$sql = $this->db->prepare("INSERT INTO registros SET id_empresa = :id_empresa, id_imovel = :id_imovel, id_contrato = :id_contrato, id_cliente = :id_cliente, prop_atual = :prop_atual");
+		$sql = $this->db->prepare("INSERT INTO contratos SET id_empresa = :id_empresa, id_imovel = :id_imovel, numero = :contrato_nr, id_cliente = :id_cliente, prop_atual = :prop_atual");
 		$sql->bindValue(':id_imovel', $id_imovel);
-		$sql->bindValue(':id_contrato', $id_contrato);
+		$sql->bindValue(':contrato_nr', $contrato_nr);
 		$sql->bindValue(':id_cliente', $id_cliente);
 		$sql->bindValue(':prop_atual', $prop_atual);
 		$sql->bindValue(':id_empresa', $id_empresa);
@@ -82,6 +82,8 @@ class Registros extends model {
 		if ($lote_nr != '') {
 			$sql .= " AND lote = :lote_nr";
 		}
+		
+		$sql .= " ORDER BY id DESC LIMIT 0, 20";
 
 		$sql = $this->db->prepare($sql);
 		$sql->bindValue(':id_loteamento', $id_loteamento);
@@ -99,58 +101,35 @@ class Registros extends model {
 		foreach ($result as $imovel) {
 			$imovel_id = $imovel['id'];
 
-			$sql = "SELECT
-			registros.id as id_registro,
-			registros.id_contrato,
-			registros.id_cliente,
-			registros.id_imovel,
-			registros.prop_atual,
-			contratos.numero as numero_contrato,
-			clientes.nome as nome_cliente,
-			imoveis.quadra,
-			imoveis.lote,
-			(select nome from loteamentos where id = imoveis.id_loteamento) as nome_loteamento
-			";
+			$sql = "SELECT *, 
+			(select id_loteamento from imoveis where id = :imovel_id) as loteamento_id,
+			(select quadra from imoveis where id = :imovel_id) as quadra,
+			(select lote from imoveis where id = :imovel_id) as lote,
+			(select nome from loteamentos where id = loteamento_id) as loteamento_nome,
+			(select nome from clientes where id = id_cliente) as cliente_nome
+			FROM contratos 
+			WHERE id_imovel = :imovel_id AND prop_atual = :prop_atual AND id_empresa = :id_empresa";
 
 			if ($contrato_nr != '') {
-				$sql .= ", contratos.numero";
+				$sql .= " AND numero = :contrato_nr";
 			}
-
 			if ($cliente != '') {
-				$sql .= ", clientes.nome";
-			}
-
-			$sql .= " 
-			FROM registros 
-			JOIN contratos ON contratos.id = registros.id_contrato
-			JOIN clientes ON clientes.id = registros.id_cliente
-			JOIN imoveis ON imoveis.id = :imovel_id
-			";
-			
-			$sql .= " WHERE registros.id_imovel = :imovel_id AND prop_atual = :prop_atual";
-
-			if ($contrato_nr != '') {
-				$sql .= " AND contratos.numero = :contrato_nr";
-			}
-
-			if ($cliente != '') {
-				$sql .= " AND clientes.nome LIKE :cliente";
+				$sql .= " AND id_cliente = :cliente";
 			}
 
 			//print_r($sql); exit;
 
 			$sql = $this->db->prepare($sql);
 
+			$sql->bindValue(':imovel_id', $imovel_id);
+			$sql->bindValue(':prop_atual', $prop_atual);
+			$sql->bindValue(':id_empresa', $id_empresa);
 			if ($contrato_nr != '') {
 				$sql->bindValue(':contrato_nr', $contrato_nr);
 			}
-
 			if ($cliente != '') {
-				$sql->bindValue(':cliente', '%'.$cliente.'%');
+				$sql->bindValue(':cliente', $cliente);
 			}
-
-			$sql->bindValue(':imovel_id', $imovel_id);
-			$sql->bindValue(':prop_atual', $prop_atual);
 			$sql->execute();
 
 			if ($sql->rowCount() > 0) {
